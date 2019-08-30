@@ -1,36 +1,65 @@
 {
-  "name": "electron-quick-start",
+  "name": "app-migratory-platform-desktop",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
-  "main": "main.js",
+  "description": "",
+  "main": "electron/main.js",
   "scripts": {
+    "dev": "concurrently \"BROWSER=none npm run rescripts-start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development; electron .\"",
+    "electron-dev": "cross-env NODE_ENV=development; electron .",
+    "electron-prod": "cross-env NODE_ENV=production; electron .",
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "pack-linux": "electron-packager . --platform=linux",
+    "react-start": "react-scripts start",
+    "react-build": "react-scripts build",
+    "react-test": "react-scripts test",
+    "react-eject": "react-scripts eject",
+    "rescripts-start": "rescripts start",
+    "rescripts-build": "rescripts build"
   },
-  "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
-  ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
+    "@rescripts/cli": "0.0.11",
+    "@rescripts/rescript-env": "0.0.10",
+    "concurrently": "^4.1.2",
+    "cross-env": "^5.2.0",
     "electron": "2.0.0",
+    "electron-builder": "^20.43.0",
     "electron-packager": "^13.1.1",
-    "electron-builder": "^20.43.0"
+    "wait-on": "^3.3.0"
   },
   "build": {
-    "appId": "your.id",
-    "productName": "electron-quick-start",
+    "appId": "desktop.agentplatform",
+    "productName": "app-migratory-platform-desktop",
     "target": "NSIS",
     "nsis": {
       "allowToChangeInstallationDirectory": false
     }
   },
   "dependencies": {
-  
-  }
+    "@material-ui/core": "^3.9.3",
+    "@material-ui/icons": "^3.0.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "^3.1.1",
+    "socket.io-file-stream": "^0.3.7-ts",
+    "zip-local": "^0.3.4"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "homepage": "."
 }
