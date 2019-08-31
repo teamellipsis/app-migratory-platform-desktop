@@ -1,5 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const listeners = require('./listeners')
+listeners.register()
 
 let mainWindow
 
