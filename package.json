@@ -4,7 +4,7 @@
   "description": "",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "concurrently \"BROWSER=none npm run rescripts-start\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development; electron .\"",
+    "dev": "concurrently \"BROWSER=none npm run rescripts-start\" \"wait-on http://localhost:3000 && export NODE_ENV=development; electron .\"",
     "electron-dev": "cross-env NODE_ENV=development; electron .",
     "electron-prod": "cross-env NODE_ENV=production; electron .",
     "start": "electron .",
@@ -20,6 +20,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@material-ui/core": "^3.9.3",
+    "@material-ui/icons": "^3.0.2",
     "@rescripts/cli": "0.0.11",
     "@rescripts/rescript-env": "0.0.10",
     "concurrently": "^4.1.2",
@@ -27,6 +29,10 @@
     "electron": "2.0.0",
     "electron-builder": "^20.43.0",
     "electron-packager": "^13.1.1",
+    "electron-rebuild": "^1.8.6",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "^3.1.1",
     "wait-on": "^3.3.0"
   },
   "build": {
@@ -38,13 +44,8 @@
     }
   },
   "dependencies": {
-    "@material-ui/core": "^3.9.3",
-    "@material-ui/icons": "^3.0.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "^3.1.1",
-    "socket.io-file-stream": "^0.3.7-ts",
-    "zip-local": "^0.3.4"
+    "adm-zip": "^0.4.13",
+    "sqlite3": "^4.1.0"
   },
   "eslintConfig": {
     "extends": "react-app"
