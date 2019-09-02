@@ -116,11 +116,13 @@ class FreshConfig extends React.Component {
             if (!fs.existsSync(appsPath)) {
                 fs.mkdirSync(appsPath)
             }
+            db.set(key.APPS_DIR, appsPath);
 
             let packagesPath = path.join(workingDir, 'packages');
             if (!fs.existsSync(packagesPath)) {
                 fs.mkdirSync(packagesPath)
             }
+            db.set(key.PACKAGES_DIR, packagesPath);
 
             this.handleNext();
         }).catch((err) => {
