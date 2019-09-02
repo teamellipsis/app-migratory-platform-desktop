@@ -6,7 +6,6 @@ import AppList from './AppList';
 const styles = theme => ({
     root: {
         backgroundColor: theme.palette.background.paper,
-        height: '-webkit-fill-available',
     },
 });
 

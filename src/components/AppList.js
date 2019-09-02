@@ -9,12 +9,13 @@ import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
+import AppOptionDialog from './AppOptionDialog';
 
 import db from '../config/Database';
-import path from 'path';
 import key from '../const/Key';
 
 import fs from 'fs';
+import path from 'path';
 
 const styles = theme => ({
     root: {
@@ -32,6 +33,8 @@ const styles = theme => ({
 class AppList extends React.Component {
     state = {
         apps: null,
+        openDialog: false,
+        dialogTitle: '',
     };
 
     componentDidMount() {
@@ -55,12 +58,28 @@ class AppList extends React.Component {
         });
     }
 
+    handleDialogOpen = (app) => () => {
+        this.setState({
+            openDialog: true,
+            dialogTitle: app,
+        });
+    };
+
+    handleDialogClose = () => {
+        this.setState({ openDialog: false });
+    };
+
     render() {
         const { classes } = this.props;
         const { apps } = this.state;
 
         return (
             <div className={classes.root}>
+                <AppOptionDialog
+                    open={this.state.openDialog}
+                    title={this.state.dialogTitle}
+                    onClose={this.handleDialogClose}
+                />
                 <Grid container spacing={16}>
                     <Grid item xs={12} md={6}>
                         <div className={classes.content}>
@@ -71,7 +90,7 @@ class AppList extends React.Component {
                                 :
                                 <List dense={true}>
                                     {apps.map((app, index) => (
-                                        <ListItem button key={index}>
+                                        <ListItem button key={index} onClick={this.handleDialogOpen(app)}>
                                             <ListItemAvatar>
                                                 <Avatar>
                                                     <FolderIcon />
