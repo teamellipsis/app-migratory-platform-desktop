@@ -7,7 +7,7 @@ function getProjectDir() {
 
 function extractZip(filePath, targetPath) {
     return new Promise((resolve, reject) => {
-        ipcRenderer.once(Event.FM_EXTRACT_ZIP_FINISH, (event, { error, stdout, stderr }) => {
+        ipcRenderer.once(Event.FM_EXTRACT_ZIP_FINISH, (event, { error }) => {
             if (error) {
                 reject()
             } else {
