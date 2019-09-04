@@ -1,4 +1,5 @@
 const cluster = require('cluster');
+const message = require('./const/message');
 
 if (cluster.isMaster) {
 
@@ -40,8 +41,10 @@ if (cluster.isMaster) {
         });
 
         cluster.on('fork', (worker) => {
-            console.log(`Main worker ${worker.process.pid} forked`);
-            process.env.MAIN_WORKER_ID = worker.id;
+            console.log(`Worker ${worker.process.pid} forked`);
+            if (process.env.MAIN_WORKER_ID === undefined) {
+                process.env.MAIN_WORKER_ID = worker.id;
+            }
         });
     }
 
@@ -67,5 +70,16 @@ if (cluster.isMaster) {
     if (process.env['MAIN_WORKER'] !== undefined) {
         const workers = require('./workers')
         workers.register();
+    } else if (process.env['SERVER_FILE_PATH'] !== undefined) {
+
+        require(process.env['SERVER_FILE_PATH']);
+
+        process.on('uncaughtException', (error) => {
+            process.send({ msg: message.SERVER_ERROR, error });
+        });
+
+        process.on('unhandledRejection', (error) => {
+            process.send({ msg: message.SERVER_ERROR, error });
+        });
     }
 }

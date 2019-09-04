@@ -10,9 +10,12 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
 import AppOptionDialog from './AppOptionDialog';
+import SnackMessage from './SnackMessage';
 
 import db from '../config/Database';
 import key from '../const/Key';
+import snack from '../const/Snack';
+import appManager from '../config/AppManager';
 
 import fs from 'fs';
 import path from 'path';
@@ -20,7 +23,6 @@ import path from 'path';
 const styles = theme => ({
     root: {
         flexGrow: 1,
-        maxWidth: 752,
     },
     content: {
         backgroundColor: theme.palette.background.paper,
@@ -34,7 +36,10 @@ class AppList extends React.Component {
     state = {
         apps: null,
         openDialog: false,
-        dialogTitle: '',
+        appName: '',
+        openSnack: false,
+        snackMsg: '',
+        snackVariant: snack.SUCCESS,
     };
 
     componentDidMount() {
@@ -61,7 +66,7 @@ class AppList extends React.Component {
     handleDialogOpen = (app) => () => {
         this.setState({
             openDialog: true,
-            dialogTitle: app,
+            appName: app,
         });
     };
 
@@ -69,19 +74,55 @@ class AppList extends React.Component {
         this.setState({ openDialog: false });
     };
 
+    handleSnackOpen = (msg, variant) => {
+        this.setState({
+            openSnack: true,
+            snackMsg: msg,
+            snackVariant: variant,
+        });
+    };
+
+    handleSnackClose = () => {
+        this.setState({ openSnack: false });
+    };
+
+    handleAppOpen = () => {
+        let appsDir = db.get(key.APPS_DIR).value;
+        let appPath = path.join(appsDir, this.state.appName);
+        appManager.openApp(appPath).catch(() => {
+            this.handleSnackOpen(`App(${this.state.appName}) crashed. Please try again.`, snack.ERROR);
+        });
+    };
+
+    handleAppPackage = () => { };
+    handleAppSend = () => { };
+    handleAppReset = () => { };
+    handleAppDelete = () => { };
+
     render() {
         const { classes } = this.props;
-        const { apps } = this.state;
+        const { apps, openSnack, snackMsg, snackVariant } = this.state;
 
         return (
             <div className={classes.root}>
                 <AppOptionDialog
                     open={this.state.openDialog}
-                    title={this.state.dialogTitle}
+                    title={this.state.appName}
                     onClose={this.handleDialogClose}
+                    handleOpen={this.handleAppOpen}
+                    handlePackage={this.handleAppPackage}
+                    handleSend={this.handleAppSend}
+                    handleReset={this.handleAppReset}
+                    handleDelete={this.handleAppDelete}
+                />
+                <SnackMessage
+                    open={openSnack}
+                    onClose={this.handleSnackClose}
+                    variant={snackVariant}
+                    message={snackMsg}
                 />
                 <Grid container spacing={16}>
-                    <Grid item xs={12} md={6}>
+                    <Grid item xs={12}>
                         <div className={classes.content}>
                             {apps === null ?
                                 <Typography align={'center'} color="inherit" noWrap className={classes.title}>

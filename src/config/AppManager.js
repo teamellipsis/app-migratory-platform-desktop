@@ -2,9 +2,8 @@ import { ipcRenderer } from 'electron';
 import * as Event from '../const/Event'
 
 function openApp(appPath) {
-    console.log(appPath);
     return new Promise((resolve, reject) => {
-        ipcRenderer.once(Event.AM_OPEN_APP_FINISH, (event, { error, stdout, stderr }) => {
+        ipcRenderer.once(Event.AM_OPEN_APP_FINISH, (event, { error }) => {
             if (error) {
                 reject()
             } else {
