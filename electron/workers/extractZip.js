@@ -1,15 +1,16 @@
-const cluster = require('cluster');
 const AdmZip = require('adm-zip');
-const message = require('../const/message');
+const path = require('path');
+const message = require(path.join(__dirname, '../const/message'));
 
-if (cluster.isWorker) {
-    process.on('message', (msg) => {
-        if (msg.msg === message.EXECUTE) {
-            const { func, ...args } = msg;
+process.on('message', (inMsg) => {
+    console.log(inMsg);
+    const { msg, func, ...args } = inMsg;
+    if (msg === message.EXECUTE) {
+        if (typeof this[func] === 'function') {
             this[func](args);
         }
-    });
-}
+    }
+});
 
 this.extractZip = (args) => {
     try {
@@ -18,8 +19,10 @@ this.extractZip = (args) => {
 
         var zip = new AdmZip(filePath);
         zip.extractAllTo(targetPath, true);
+        console.log("extractZip-finished", args);
         process.send({ msg: message.EXTRACT_FINISHED, error: null });
     } catch (error) {
+        console.error("extractZip-finished", args, error);
         process.send({ msg: message.EXTRACT_FINISHED, error });
     }
 };

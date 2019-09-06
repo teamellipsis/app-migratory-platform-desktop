@@ -2,65 +2,45 @@ const { ipcMain } = require('electron');
 const path = require('path');
 const Event = require('../../src/const/Event');
 const { BrowserWindow } = require('electron');
-const http = require('http');
-const cluster = require('cluster');
 const message = require('../const/message');
+const childProcess = require('child_process');
 
 ipcMain.on(Event.AM_OPEN_APP, (event, { appPath }) => {
-    let serverFilePath = path.join(appPath, 'server.js');
-    let worker = cluster.fork({ SERVER_FILE_PATH: serverFilePath, APP_PATH: appPath });
+    const serverFilePath = path.join(appPath, 'server.js');
+    const worker = childProcess.fork(serverFilePath);
 
-    worker.once('online', () => {
-        console.log(`Server ${worker.id} online`);
-    });
+    // Only listen for first `error` or `listening` message
+    worker.once('message', (inMsg) => {
+        const { msg } = inMsg;
+        if (msg === message.SERVER_ERROR) {
+            const { error } = inMsg;
+            event.sender.send(Event.AM_OPEN_APP_FINISH, { error });
 
-    worker.once('listening', (address) => {
-        event.sender.send(Event.AM_OPEN_APP_FINISH, { error: null });
-        console.log(`Server listening on port:${address.port}`);
+        } else if (msg === message.SERVER_LISTENING) {
+            const { server } = inMsg;
+            console.log(`Server listening on port:${server.port}`);
+            event.sender.send(Event.AM_OPEN_APP_FINISH, { error: null });
 
-        let newWindow = new BrowserWindow({
-            width: 800,
-            height: 600,
-            show: false,
-        });
+            let newWindow = new BrowserWindow({
+                width: 800,
+                height: 600,
+                show: false,
+            });
 
-        // TODO(Remove hardcoded URL)
-        let url = 'http://localhost:3001';
-        let options = {
-            hostname: 'localhost',
-            port: '3001',
-            method: 'GET',
-        };
+            let url = `http://localhost:${server.port}`;
+            newWindow.loadURL(url);
 
-        checkAndResend(newWindow, url, options);
+            newWindow.on('ready-to-show', () => {
+                newWindow.show();
+            });
 
-        newWindow.on('ready-to-show', () => {
-            newWindow.show();
-        });
-
-        newWindow.on('closed', () => {
-            newWindow = null
-        });
-    });
-
-    worker.once('message', (msg) => {
-        if (msg.msg === message.SERVER_ERROR) {
-            event.sender.send(Event.AM_OPEN_APP_FINISH, { error: msg.error });
+            newWindow.on('closed', () => {
+                newWindow = null
+            });
         }
+    });
+
+    worker.on('exit', (code, signal) => {
+        console.log(`Worker ${worker.pid} exit with code:${code}, signal:${signal}`);
     });
 });
-
-function checkAndResend(window, url, options) {
-    let req = http.request(options, (res) => {
-        if (res.statusCode === 200) {
-            window.loadURL(url);
-        }
-    });
-
-    req.on('error', (err) => {
-        setTimeout(() => {
-            checkAndResend(window, url, options);
-        }, 16); // Since, devices display 60 frames per second
-    });
-    req.end();
-}

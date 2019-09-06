@@ -1,4 +1,13 @@
+const path = require('path');
+const fs = require('fs');
+const log = require(path.join(__dirname, '../config/log'));
+
+const mainWorkerLogFile = fs.createWriteStream('./main-worker.log', { flags: 'a' });
+log.overrideLogging(mainWorkerLogFile);
+
 module.exports.register = () => {
-    require('./extractZip');
+    require(path.join(__dirname, 'extractZip'));
     console.log(`Main worker ${process.pid} registered`);
 }
+
+this.register();
