@@ -94,7 +94,14 @@ class AppList extends React.Component {
         });
     };
 
-    handleAppPackage = () => { };
+    handleAppPackage = () => {
+        appManager.packageApp(this.state.appName).then(() => {
+            this.handleSnackOpen(`App(${this.state.appName}) succesfully packaged.`, snack.SUCCESS);
+        }).catch(() => {
+            this.handleSnackOpen(`App(${this.state.appName}) packaging failed. Please try again.`, snack.ERROR);
+        });
+    };
+
     handleAppSend = () => { };
     handleAppReset = () => { };
     handleAppDelete = () => { };

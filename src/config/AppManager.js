@@ -15,4 +15,18 @@ function openApp(appPath) {
     });
 }
 
-export default { openApp };
+function packageApp(appName) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once(Event.AM_PACKAGE_APP_FINISH, (event, { error }) => {
+            if (error) {
+                reject()
+            } else {
+                resolve()
+            }
+        });
+
+        ipcRenderer.send(Event.AM_PACKAGE_APP, { appName });
+    });
+}
+
+export default { openApp, packageApp };

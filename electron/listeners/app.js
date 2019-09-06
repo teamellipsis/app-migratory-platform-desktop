@@ -1,8 +1,10 @@
 const { ipcMain } = require('electron');
 const path = require('path');
 const Event = require('../../src/const/Event');
+const Key = require('../../src/const/Key');
 const { BrowserWindow } = require('electron');
 const message = require('../const/message');
+const keyValueDb = require('../config/db/key-value-db');
 const childProcess = require('child_process');
 
 ipcMain.on(Event.AM_OPEN_APP, (event, { appPath }) => {
@@ -43,4 +45,33 @@ ipcMain.on(Event.AM_OPEN_APP, (event, { appPath }) => {
     worker.on('exit', (code, signal) => {
         console.log(`Worker ${worker.pid} exit with code:${code}, signal:${signal}`);
     });
+});
+
+ipcMain.on(Event.AM_PACKAGE_APP, (event, { appName }) => {
+    let mainWorker = require('../workers/mainWorker').get();
+    if (mainWorker !== null) {
+        keyValueDb.get(Key.APPS_DIR).then((appsDirPath) => {
+            keyValueDb.get(Key.PACKAGES_DIR).then((packagesDirPath) => {
+                mainWorker.send({
+                    msg: message.EXECUTE,
+                    func: 'packageDir',
+                    srcDir: path.join(appsDirPath, appName),
+                    targetDir: packagesDirPath,
+                    appName: appName,
+                });
+
+                mainWorker.on('message', (msg) => {
+                    if (msg.msg === message.PACKAGE_FINISHED) {
+                        event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error: msg.error });
+                    }
+                });
+            }).catch((error) => {
+                event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error });
+            });
+        }).catch((error) => {
+            event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error });
+        });
+    } else {
+        event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error: "Worker process failed" })
+    }
 });

@@ -6,7 +6,7 @@ const mainWorkerLogFile = fs.createWriteStream('./main-worker.log', { flags: 'a'
 log.overrideLogging(mainWorkerLogFile);
 
 module.exports.register = () => {
-    require(path.join(__dirname, 'extractZip'));
+    require(path.join(__dirname, 'zip'));
     console.log(`Main worker ${process.pid} registered`);
 }
 

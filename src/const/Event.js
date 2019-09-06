@@ -10,3 +10,5 @@ module.exports.FM_EXTRACT_ZIP_FINISH = "extract-zip-finish_file-manager";
 /** AppManager */
 module.exports.AM_OPEN_APP = "open_app-manager";
 module.exports.AM_OPEN_APP_FINISH = "open-finish_app-manager";
+module.exports.AM_PACKAGE_APP = "package_app-manager";
+module.exports.AM_PACKAGE_APP_FINISH = "package-finish_app-manager";

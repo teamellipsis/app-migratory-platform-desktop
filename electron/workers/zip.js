@@ -26,3 +26,20 @@ this.extractZip = (args) => {
         process.send({ msg: message.EXTRACT_FINISHED, error });
     }
 };
+
+this.packageDir = (args) => {
+    try {
+        let srcDir = args.srcDir;
+        let targetDir = args.targetDir;
+        let appName = args.appName;
+
+        var zip = new AdmZip();
+        zip.addLocalFolder(srcDir, appName);
+        zip.writeZip(path.join(targetDir, `${appName}.zip`));
+        console.log("packageDir-finished", args);
+        process.send({ msg: message.PACKAGE_FINISHED, error: null });
+    } catch (error) {
+        console.error("packageDir-finished", args, error);
+        process.send({ msg: message.PACKAGE_FINISHED, error });
+    }
+};
