@@ -9,4 +9,32 @@ function get(key) {
     return ipcRenderer.sendSync(Event.KEY_VALUE_DB_GET, { key })
 }
 
-export default { set, get };
+function addNewDevice(name, mac) {
+    return ipcRenderer.sendSync(Event.DEVICES_DB_CREATE, { name, mac });
+}
+
+function getDeviceById(id) {
+    return ipcRenderer.sendSync(Event.DEVICES_DB_READ, { id });
+}
+
+function getAllDevices() {
+    return ipcRenderer.sendSync(Event.DEVICES_DB_READALL);
+}
+
+function updateDeviceById(id, name, mac) {
+    return ipcRenderer.sendSync(Event.DEVICES_DB_UPDATE, { id, name, mac });
+}
+
+function deleteDeviceById(id) {
+    return ipcRenderer.sendSync(Event.DEVICES_DB_DELETE, { id });
+}
+
+export default {
+    set,
+    get,
+    addNewDevice,
+    getDeviceById,
+    getAllDevices,
+    updateDeviceById,
+    deleteDeviceById,
+};

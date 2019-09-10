@@ -1,6 +1,11 @@
 /** Database */
 module.exports.KEY_VALUE_DB_SET = "set_key-value-db";
 module.exports.KEY_VALUE_DB_GET = "get_key-value-db";
+module.exports.DEVICES_DB_CREATE = "create_devices-db";
+module.exports.DEVICES_DB_READ = "read_devices-db";
+module.exports.DEVICES_DB_READALL = "read-all_devices-db";
+module.exports.DEVICES_DB_UPDATE = "update_devices-db";
+module.exports.DEVICES_DB_DELETE = "delete_devices-db";
 
 /** FileManager */
 module.exports.FM_GET_PROJECT_DIR = "get-project-dir_file-manager";
