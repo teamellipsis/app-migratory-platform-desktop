@@ -6,6 +6,7 @@ const { BrowserWindow } = require('electron');
 const message = require('../const/message');
 const keyValueDb = require('../config/db/key-value-db');
 const childProcess = require('child_process');
+const socketWorkers = require('../workers/socketWorkers')
 
 ipcMain.on(Event.AM_OPEN_APP, (event, { appPath }) => {
     const serverFilePath = path.join(appPath, 'server.js');
@@ -73,5 +74,44 @@ ipcMain.on(Event.AM_PACKAGE_APP, (event, { appName }) => {
         });
     } else {
         event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error: "Worker process failed" })
+    }
+});
+
+ipcMain.on(Event.AM_SEND_APP_INIT, (event, { appName }) => {
+    const socketServerFilePath = path.join(__dirname, '../config/app-send-socket.js');
+    const worker = childProcess.fork(socketServerFilePath, [appName]);
+
+    socketWorkers.add(appName, worker);
+
+    // Only listen for first `error` or `listening` message
+    worker.once('message', (inMsg) => {
+        const { msg } = inMsg;
+        if (msg === message.SOCKET_ERROR) {
+            const { error } = inMsg;
+            console.log(error);
+            event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error });
+
+        } else if (msg === message.SOCKET_LISTENING) {
+            const { server } = inMsg;
+            console.log(`Socket listening on port:${server.port}`);
+            event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error: null, server });
+        }
+    });
+
+    worker.on('exit', (code, signal) => {
+        console.log(`Worker(Socket) ${worker.pid} exit with code:${code}, signal:${signal}`);
+    });
+});
+
+ipcMain.on(Event.AM_SEND_APP_END, (event, { appName }) => {
+    const worker = socketWorkers.get(appName);
+
+    if (worker !== undefined && !worker.killed) {
+        worker.kill('SIGTERM');
+        socketWorkers.delete(appName);
+
+        event.sender.send(Event.AM_SEND_APP_END_FINISH, { error: null });
+    } else {
+        event.sender.send(Event.AM_SEND_APP_END_FINISH, { error: "Worker already killed" });
     }
 });
