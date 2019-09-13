@@ -1,14 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
 import AddDeviceDialog from './AddDeviceDialog';
 import DeviceList from './DeviceList';
 
 import db from '../config/Database';
 
 import os from 'os';
+import find from 'local-devices';
 
 const styles = theme => ({
     root: {
@@ -33,10 +32,12 @@ class Devices extends React.Component {
         openAddDeviceDialog: false,
         trustedDevices: [],
         connectedDevices: [],
+        connections: [],
     }
 
     componentDidMount() {
         this.updateConnectedDeviceList();
+        this.updateConnectionList();
     }
 
     updateTrustedDeviceList = () => {
@@ -44,11 +45,11 @@ class Devices extends React.Component {
         this.setState({ trustedDevices: devices });
     };
 
-    updateConnectedDeviceList = () => {
-        this.setState({ connectedDevices: [] });
+    updateConnectionList = () => {
+        this.setState({ connections: [] });
         let networkInterfaces = os.networkInterfaces();
         Object.keys(networkInterfaces).forEach((ifaceName, index, array) => {
-            let device = {};
+            let connection = {};
             let alias = 0;
             networkInterfaces[ifaceName].forEach((iface, index, array) => {
 
@@ -57,21 +58,28 @@ class Devices extends React.Component {
                 }
 
                 if (alias === 0) {
-                    device.ip = iface.address;
-                    device.name = ifaceName;
-                    device.mac = iface.mac;
+                    connection.ip = iface.address;
+                    connection.name = ifaceName;
+                    connection.mac = iface.mac;
                 } else {
-                    device.ip = device.ip + ", " + iface.address
+                    connection.ip = connection.ip + ", " + iface.address
                 }
                 alias++;
             });
-            if (!(Object.keys(device).length === 0 && device.constructor === Object)) {
+            if (!(Object.keys(connection).length === 0 && connection.constructor === Object)) {
                 this.setState((state) => {
-                    let connectedDevices = state.connectedDevices;
-                    connectedDevices.push(device)
-                    return { connectedDevices }
+                    let connections = state.connections;
+                    connections.push(connection)
+                    return { connections }
                 });
             }
+        });
+    };
+
+    updateConnectedDeviceList = () => {
+        this.setState({ connectedDevices: [] });
+        find().then(devices => {
+            this.setState({ connectedDevices: devices });
         });
     };
 
@@ -92,14 +100,12 @@ class Devices extends React.Component {
                 <DeviceList
                     trustedDevices={this.state.trustedDevices}
                     connectedDevices={this.state.connectedDevices}
+                    connections={this.state.connections}
                     updateTrustedDeviceList={this.updateTrustedDeviceList}
+                    updateConnectedDeviceList={this.updateConnectedDeviceList}
+                    updateConnectionList={this.updateConnectionList}
+                    onAddDevice={this.handleOpenAddDeviceDialog}
                 />
-                <Fab
-                    color="secondary"
-                    className={classes.fab}
-                    onClick={this.handleOpenAddDeviceDialog}>
-                    <AddIcon />
-                </Fab>
                 <AddDeviceDialog
                     title="Add trusted device"
                     open={this.state.openAddDeviceDialog}

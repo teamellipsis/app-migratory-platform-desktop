@@ -7,6 +7,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import _ from 'lodash';
 
 import db from '../config/Database';
 
@@ -14,19 +15,22 @@ class AddDeviceDialog extends React.Component {
     state = {
         deviceName: "",
         deviceMac: "",
-        prevDeviceId: null,
     };
 
-    static getDerivedStateFromProps(props, state) {
-        if (props.deviceId !== undefined && props.deviceId !== state.prevDeviceId) {
-            const { name, mac } = db.getDeviceById(props.deviceId).value
-            return {
+    componentDidUpdate(prevProps, prevState) {
+        const { deviceId, device } = this.props;
+        if (!_.isNil(deviceId) && deviceId !== prevProps.deviceId) {
+            const { name, mac } = db.getDeviceById(deviceId).value
+            this.setState({
                 deviceName: name,
                 deviceMac: mac,
-                prevDeviceId: props.deviceId,
-            };
+            });
+        } else if (!_.isNil(device) && !_.isEqual(device, prevProps.device)) {
+            this.setState({
+                deviceName: device.name,
+                deviceMac: device.mac,
+            });
         }
-        return null;
     }
 
     handleClose = () => {
@@ -38,7 +42,8 @@ class AddDeviceDialog extends React.Component {
     };
 
     handleSave = () => {
-        if (this.props.deviceId) {
+        // TODO(Validate MAC)
+        if (this.props.device === null && this.props.deviceId) {
             db.updateDeviceById(this.props.deviceId, this.state.deviceName, this.state.deviceMac);
         } else {
             db.addNewDevice(this.state.deviceName, this.state.deviceMac);
@@ -102,6 +107,7 @@ AddDeviceDialog.propTypes = {
     open: PropTypes.bool.isRequired,
     title: PropTypes.string.isRequired,
     deviceId: PropTypes.number,
+    device: PropTypes.object,
 };
 
 export default AddDeviceDialog;
