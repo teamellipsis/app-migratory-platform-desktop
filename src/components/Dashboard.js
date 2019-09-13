@@ -17,8 +17,10 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import AppsIcon from '@material-ui/icons/Apps';
 import DevicesIcon from '@material-ui/icons/DevicesOther';
+import ShareIcon from '@material-ui/icons/SwapHoriz';
 import Apps from './Apps';
 import Devices from './Devices';
+import Sharing from './Sharing';
 
 const drawerWidth = 240;
 
@@ -84,9 +86,9 @@ const styles = theme => ({
     },
 });
 
-const drawerItems = ['Apps', 'Devices'];
-const drawerIcons = [<AppsIcon />, <DevicesIcon />];
-const windows = [<Apps />, <Devices />];
+const drawerItems = ['Apps', 'Devices', 'Sharing'];
+const drawerIcons = [<AppsIcon />, <DevicesIcon />, <ShareIcon />];
+const windows = [<Apps />, <Devices />, <Sharing />];
 
 function getIcon(index) {
     return drawerIcons[index];
@@ -100,7 +102,8 @@ function generateWindow(element, index, selectedDrawerItemsIndex, props) {
 class Dashboard extends React.Component {
     state = {
         open: false,
-        selectedDrawerItemsIndex: 0,
+        selectedDrawerItemsIndex: 2,
+        intent: null,
     };
 
     handleDrawerOpen = () => {
@@ -112,12 +115,22 @@ class Dashboard extends React.Component {
     };
 
     handleDrawerItemClick = (index) => () => {
-        this.setState({ selectedDrawerItemsIndex: index });
+        this.setState({
+            selectedDrawerItemsIndex: index,
+            intent: null,
+        });
     }
+
+    changeWindow = (index, intent = null) => {
+        this.setState({
+            selectedDrawerItemsIndex: index,
+            intent: intent,
+        });
+    };
 
     render() {
         const { classes, theme } = this.props;
-        const { selectedDrawerItemsIndex } = this.state;
+        const { selectedDrawerItemsIndex, intent } = this.state;
 
         return (
             <div className={classes.root}>
@@ -180,7 +193,11 @@ class Dashboard extends React.Component {
                 <main className={classes.content}>
                     <div className={classes.toolbar} />
                     {windows.map((element, index) => (
-                        generateWindow(element, index, selectedDrawerItemsIndex, { key: index })
+                        generateWindow(element, index, selectedDrawerItemsIndex, {
+                            key: index,
+                            changeWindow: this.changeWindow,
+                            intent: intent,
+                        })
                     ))}
                 </main>
             </div>

@@ -17,7 +17,8 @@ module.exports.delete = (appName) => {
 };
 
 module.exports.exists = (appName) => {
-    if (workers[appName] === undefined) {
+    const worker = workers[appName];
+    if (worker !== undefined && !worker.killed) {
         return true;
     }
     return false;

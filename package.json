@@ -11,6 +11,7 @@
     "start": "electron .",
     "dist": "electron-builder",
     "pack-linux": "electron-packager . --platform=linux --out=out",
+    "pack": "electron-packager --help",
     "react-start": "rescripts start",
     "react-build": "rescripts build",
     "react-test": "rescripts test"
@@ -28,8 +29,11 @@
     "electron-builder": "^20.43.0",
     "electron-packager": "^13.1.1",
     "electron-rebuild": "^1.8.6",
+    "lodash": "^4.17.15",
+    "qrcode.react": "^0.9.3",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-qr-reader": "^2.2.1",
     "react-scripts": "^3.1.1",
     "wait-on": "^3.3.0"
   },
@@ -43,6 +47,9 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.13",
+    "local-devices": "^2.0.0",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0",
     "sqlite3": "^4.1.0"
   },
   "eslintConfig": {

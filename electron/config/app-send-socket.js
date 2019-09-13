@@ -44,3 +44,10 @@ server.listen(0, (err) => {
     if (err) throw err;
     console.log(`Socket ready on http://localhost:${server.address().port}, pid:${process.pid}`);
 });
+
+process.on("message", (inMsg) => {
+    const { msg } = inMsg;
+    if (msg === Message.SOCKET_GET_ADDR) {
+        process.send({ msg: Message.SOCKET_GET_ADDR, server: server.address() });
+    }
+});

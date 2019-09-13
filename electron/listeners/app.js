@@ -78,29 +78,40 @@ ipcMain.on(Event.AM_PACKAGE_APP, (event, { appName }) => {
 });
 
 ipcMain.on(Event.AM_SEND_APP_INIT, (event, { appName }) => {
-    const socketServerFilePath = path.join(__dirname, '../config/app-send-socket.js');
-    const worker = childProcess.fork(socketServerFilePath, [appName]);
+    if (socketWorkers.exists(appName)) {
+        const worker = socketWorkers.get(appName);
+        worker.once('message', (inMsg) => {
+            const { msg } = inMsg;
+            if (msg === message.SOCKET_GET_ADDR) {
+                const { server } = inMsg;
+                event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error: null, server });
+            }
+        });
+        worker.send({ msg: message.SOCKET_GET_ADDR });
+    } else {
 
-    socketWorkers.add(appName, worker);
+        const socketServerFilePath = path.join(__dirname, '../config/app-send-socket.js');
+        const worker = childProcess.fork(socketServerFilePath, [appName]);
+        socketWorkers.add(appName, worker);
 
-    // Only listen for first `error` or `listening` message
-    worker.once('message', (inMsg) => {
-        const { msg } = inMsg;
-        if (msg === message.SOCKET_ERROR) {
-            const { error } = inMsg;
-            console.log(error);
-            event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error });
+        // Only listen for first `error` or `listening` message
+        worker.once('message', (inMsg) => {
+            const { msg } = inMsg;
+            if (msg === message.SOCKET_ERROR) {
+                const { error } = inMsg;
+                event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error });
 
-        } else if (msg === message.SOCKET_LISTENING) {
-            const { server } = inMsg;
-            console.log(`Socket listening on port:${server.port}`);
-            event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error: null, server });
-        }
-    });
+            } else if (msg === message.SOCKET_LISTENING) {
+                const { server } = inMsg;
+                console.log(`Socket listening on port:${server.port}`);
+                event.sender.send(Event.AM_SEND_APP_INIT_FINISH, { error: null, server });
+            }
+        });
 
-    worker.on('exit', (code, signal) => {
-        console.log(`Worker(Socket) ${worker.pid} exit with code:${code}, signal:${signal}`);
-    });
+        worker.on('exit', (code, signal) => {
+            console.log(`Worker(Socket) ${worker.pid} exit with code:${code}, signal:${signal}`);
+        });
+    }
 });
 
 ipcMain.on(Event.AM_SEND_APP_END, (event, { appName }) => {

@@ -51,7 +51,7 @@ class Devices extends React.Component {
             let device = {};
             let alias = 0;
             networkInterfaces[ifaceName].forEach((iface, index, array) => {
-                
+
                 if (iface.internal !== false) {
                     return;
                 }

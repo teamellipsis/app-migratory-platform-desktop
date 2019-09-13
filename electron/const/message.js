@@ -6,3 +6,4 @@ module.exports.PACKAGE_FINISHED = "package_finished";
 module.exports.SOCKET_ERROR = "socket_error";
 module.exports.SOCKET_LISTENING = "socket_listening";
 module.exports.SOCKET_SENT = "socket_sent";
+module.exports.SOCKET_GET_ADDR = "socket_get_address";

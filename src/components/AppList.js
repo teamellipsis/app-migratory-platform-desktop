@@ -15,6 +15,8 @@ import SnackMessage from './SnackMessage';
 import db from '../config/Database';
 import key from '../const/Key';
 import snack from '../const/Snack';
+import Window from '../const/Window';
+import Intent from '../const/Intent';
 import appManager from '../config/AppManager';
 
 import fs from 'fs';
@@ -102,7 +104,14 @@ class AppList extends React.Component {
         });
     };
 
-    handleAppSend = () => { };
+    handleAppSend = () => {
+        this.props.changeWindow(Window.SHARING, {
+            action: Intent.ACTION_EXECUTE,
+            func: "handleSendApp",
+            args: { appName: this.state.appName },
+        });
+    };
+
     handleAppReset = () => { };
     handleAppDelete = () => { };
 
@@ -161,6 +170,7 @@ class AppList extends React.Component {
 
 AppList.propTypes = {
     classes: PropTypes.object.isRequired,
+    changeWindow: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(AppList);

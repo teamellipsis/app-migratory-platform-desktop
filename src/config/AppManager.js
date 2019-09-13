@@ -29,4 +29,32 @@ function packageApp(appName) {
     });
 }
 
-export default { openApp, packageApp };
+function sendAppInit(appName) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once(Event.AM_SEND_APP_INIT_FINISH, (event, { error, server }) => {
+            if (error) {
+                reject();
+            } else {
+                resolve(server);
+            }
+        });
+
+        ipcRenderer.send(Event.AM_SEND_APP_INIT, { appName });
+    });
+}
+
+function sendAppEnd(appName) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once(Event.AM_SEND_APP_END_FINISH, (event, { error }) => {
+            if (error) {
+                reject();
+            } else {
+                resolve();
+            }
+        });
+
+        ipcRenderer.send(Event.AM_SEND_APP_END, { appName });
+    });
+}
+
+export default { openApp, packageApp, sendAppInit, sendAppEnd };
