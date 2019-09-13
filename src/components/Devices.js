@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import AddDeviceDialog from './AddDeviceDialog';
 import DeviceList from './DeviceList';
+import SnackMessage from './SnackMessage';
 
 import db from '../config/Database';
+import Snack from '../const/Snack';
 
 import os from 'os';
 import find from 'local-devices';
@@ -33,6 +35,9 @@ class Devices extends React.Component {
         trustedDevices: [],
         connectedDevices: [],
         connections: [],
+        openSnack: false,
+        snackMsg: '',
+        snackVariant: Snack.SUCCESS,
     }
 
     componentDidMount() {
@@ -48,6 +53,9 @@ class Devices extends React.Component {
     updateConnectionList = () => {
         this.setState({ connections: [] });
         let networkInterfaces = os.networkInterfaces();
+
+        let connections = [];
+
         Object.keys(networkInterfaces).forEach((ifaceName, index, array) => {
             let connection = {};
             let alias = 0;
@@ -67,19 +75,34 @@ class Devices extends React.Component {
                 alias++;
             });
             if (!(Object.keys(connection).length === 0 && connection.constructor === Object)) {
-                this.setState((state) => {
-                    let connections = state.connections;
-                    connections.push(connection)
-                    return { connections }
-                });
+                // this.setState((state) => {
+                //     let connections = state.connections;
+                connections.push(connection)
+                //     return { connections }
+                // });
             }
         });
+
+        if (connections.length === 0) {
+            this.handleSnackOpen('No connections.', Snack.INFO);
+        } else {
+            this.setState({ connections }, () => {
+                this.handleSnackOpen('Succesfully refreshed.', Snack.SUCCESS);
+            });
+        }
     };
 
     updateConnectedDeviceList = () => {
         this.setState({ connectedDevices: [] });
         find().then(devices => {
             this.setState({ connectedDevices: devices });
+            if (devices.length === 0) {
+                this.handleSnackOpen('No connected devices.', Snack.INFO);
+            } else {
+                this.handleSnackOpen('Succesfully refreshed.', Snack.SUCCESS);
+            }
+        }).catch((err) => {
+            this.handleSnackOpen('Something went wrong.', Snack.ERROR);
         });
     };
 
@@ -92,8 +115,21 @@ class Devices extends React.Component {
         this.updateTrustedDeviceList();
     };
 
+    handleSnackOpen = (msg, variant) => {
+        this.setState({
+            openSnack: true,
+            snackMsg: msg,
+            snackVariant: variant,
+        });
+    };
+
+    handleSnackClose = () => {
+        this.setState({ openSnack: false });
+    };
+
     render() {
         const { classes, active } = this.props;
+        const { openSnack, snackVariant, snackMsg } = this.state;
         let display = active ? 'block' : 'none';
         return (
             <div style={{ display }} className={classes.root}>
@@ -110,6 +146,12 @@ class Devices extends React.Component {
                     title="Add trusted device"
                     open={this.state.openAddDeviceDialog}
                     onClose={this.handleCloseAddDeviceDialog}
+                />
+                <SnackMessage
+                    open={openSnack}
+                    onClose={this.handleSnackClose}
+                    variant={snackVariant}
+                    message={snackMsg}
                 />
                 <div className={classes.toolbar} />
             </div>
