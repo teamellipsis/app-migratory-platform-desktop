@@ -1,0 +1,19 @@
+{
+  "name": "application-migratory-platform",
+  "version": "1.0.0",
+  "description": "Node dependencies for desktop apps which are launched by this Electron project",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@material-ui/core": "^3.9.3",
+    "@material-ui/icons": "^3.0.2",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "next": "^8.1.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-draggable": "^3.3.2",
+    "react-redux": "^7.1.1",
+    "redux": "^4.0.4"
+  }
+}
