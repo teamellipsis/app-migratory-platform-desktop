@@ -110,10 +110,22 @@ class Sharing extends React.Component {
                 appName,
             });
             this.handleCloseLoadingDialog();
+            this.handleSendAppFinish(appName);
         }).catch(() => {
             this.handleSnackOpen(`Failed to establish app sending. Please try again.`, Snack.ERROR);
             this.handleCloseLoadingDialog();
         });
+    };
+
+    handleSendAppFinish = (appName) => {
+        appManager.sendAppSendListen(appName).then(() => {
+            this.handleSnackOpen(`App successfully send.`, Snack.SUCCESS);
+            appManager.sendAppEnd(this.state.appName).then(() => {
+                this.handleCloseQrCodeDialog();
+            }).catch(() => {
+                this.handleSnackOpen(`Failed to finalize app sending.`, Snack.ERROR);
+            });
+        }).catch(() => { });
     };
 
     handleOnSelectNetworkInterface = connection => () => {

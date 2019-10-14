@@ -22,3 +22,5 @@ module.exports.AM_SEND_APP_INIT = "send-init_app-manager";
 module.exports.AM_SEND_APP_INIT_FINISH = "send-init-finish_app-manager";
 module.exports.AM_SEND_APP_END = "send-end_app-manager";
 module.exports.AM_SEND_APP_END_FINISH = "send-end-finish_app-manager";
+module.exports.AM_SEND_APP_SEND_FINISH_LISTEN = "send-app-finish-listen_app-manager";
+module.exports.AM_SEND_APP_SEND_FINISHED = "send-app-finished_app-manager";

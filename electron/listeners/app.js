@@ -126,3 +126,15 @@ ipcMain.on(Event.AM_SEND_APP_END, (event, { appName }) => {
         event.sender.send(Event.AM_SEND_APP_END_FINISH, { error: "Worker already killed" });
     }
 });
+
+ipcMain.on(Event.AM_SEND_APP_SEND_FINISH_LISTEN, (event, { appName }) => {
+    const worker = socketWorkers.get(appName);
+
+    worker.once('message', (inMsg) => {
+        const { msg } = inMsg;
+        if (msg === message.SOCKET_SENT) {
+            const { appName } = inMsg;
+            event.sender.send(Event.AM_SEND_APP_SEND_FINISHED, { error: null, appName });
+        }
+    });
+});

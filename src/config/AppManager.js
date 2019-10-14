@@ -57,4 +57,18 @@ function sendAppEnd(appName) {
     });
 }
 
-export default { openApp, packageApp, sendAppInit, sendAppEnd };
+function sendAppSendListen(appName) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once(Event.AM_SEND_APP_SEND_FINISHED, (event, { error }) => {
+            if (error) {
+                reject();
+            } else {
+                resolve();
+            }
+        });
+
+        ipcRenderer.send(Event.AM_SEND_APP_SEND_FINISH_LISTEN, { appName });
+    });
+}
+
+export default { openApp, packageApp, sendAppInit, sendAppEnd, sendAppSendListen };
