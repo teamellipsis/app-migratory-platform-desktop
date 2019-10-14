@@ -52,8 +52,8 @@ class SelectNetworkDialog extends React.Component {
                 <Divider />
                 <DialogContent className={classes.content}>
                     {connections === undefined || connections.length === 0 ?
-                        <Typography align={'center'} color="inherit" noWrap className={classes.title}>
-                            No connections.
+                        <Typography align={'center'} color="inherit" className={classes.title}>
+                            No connections. Please establish connection and refresh.
                         </Typography>
                         :
                         <List dense={true}>

@@ -11,7 +11,6 @@
     "start": "electron .",
     "dist": "electron-builder",
     "pack-linux": "electron-packager . --platform=linux --out=out",
-    "pack": "electron-packager --help",
     "react-start": "rescripts start",
     "react-build": "rescripts build",
     "react-test": "rescripts test"

@@ -75,11 +75,7 @@ class Devices extends React.Component {
                 alias++;
             });
             if (!(Object.keys(connection).length === 0 && connection.constructor === Object)) {
-                // this.setState((state) => {
-                //     let connections = state.connections;
                 connections.push(connection)
-                //     return { connections }
-                // });
             }
         });
 

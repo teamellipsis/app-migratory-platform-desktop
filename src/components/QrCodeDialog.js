@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
+import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
 import Divider from '@material-ui/core/Divider';
 import QRCode from 'qrcode.react';
@@ -32,6 +33,9 @@ class QrCodeDialog extends React.Component {
                 <Divider />
                 <DialogContent className={classes.content}>
                     <QRCode value={qrCode} includeMargin={true} size={256}/>
+                    <Typography align={'center'} color="inherit">
+                        {qrCode}
+                    </Typography>
                 </DialogContent>
             </Dialog>
         );

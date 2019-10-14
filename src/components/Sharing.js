@@ -8,11 +8,13 @@ import ReceiveIcon from '@material-ui/icons/GetApp';
 import QrCodeDialog from './QrCodeDialog';
 import SelectNetworkDialog from './SelectNetworkDialog';
 import SnackMessage from './SnackMessage';
+import LoadingDialog from './LoadingDialog';
 import _ from 'lodash';
 
 import Intent from '../const/Intent';
 import appManager from '../config/AppManager';
 import Snack from '../const/Snack';
+import encoder from '../config/Encoder';
 
 import os from 'os';
 
@@ -45,6 +47,7 @@ class Sharing extends React.Component {
         openSnack: false,
         snackMsg: '',
         snackVariant: Snack.SUCCESS,
+        openLoadingDialog: false,
     };
 
     componentDidUpdate(prevProps, prevState) {
@@ -98,6 +101,7 @@ class Sharing extends React.Component {
     };
 
     handleSendApp = ({ appName }) => {
+        this.handleOpenLoadingDialog();
         appManager.sendAppInit(appName).then((server) => {
             this.updateConnectionList();
             this.setState({
@@ -105,17 +109,18 @@ class Sharing extends React.Component {
                 server,
                 appName,
             });
+            this.handleCloseLoadingDialog();
         }).catch(() => {
             this.handleSnackOpen(`Failed to establish app sending. Please try again.`, Snack.ERROR);
+            this.handleCloseLoadingDialog();
         });
     };
 
     handleOnSelectNetworkInterface = connection => () => {
-        this.setState((state) => {
-            return {
-                qrCode: `${connection.ip}:${state.server.port}`,
-                openQrCodeDialog: true,
-            };
+        const qrCode = encoder.encodeIpv4(connection.ip, this.state.server.port);
+        this.setState({
+            qrCode,
+            openQrCodeDialog: true,
         });
         this.handleCloseSelectNetworkDialog();
     };
@@ -135,6 +140,14 @@ class Sharing extends React.Component {
     handleClickSendApp = () => { };
 
     handleClickReceiveApp = () => { };
+
+    handleOpenLoadingDialog = () => {
+        this.setState({ openLoadingDialog: true });
+    };
+
+    handleCloseLoadingDialog = () => {
+        this.setState({ openLoadingDialog: false });
+    };
 
     render() {
         const { classes, active } = this.props;
@@ -181,6 +194,11 @@ class Sharing extends React.Component {
                     onClose={this.handleSnackClose}
                     variant={this.state.snackVariant}
                     message={this.state.snackMsg}
+                />
+                <LoadingDialog
+                    open={this.state.openLoadingDialog}
+                    onClose={this.handleCloseLoadingDialog}
+                    message="Processing..."
                 />
             </div>
         );

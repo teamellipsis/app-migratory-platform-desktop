@@ -102,7 +102,7 @@ function generateWindow(element, index, selectedDrawerItemsIndex, props) {
 class Dashboard extends React.Component {
     state = {
         open: false,
-        selectedDrawerItemsIndex: 2,
+        selectedDrawerItemsIndex: 0,
         intent: null,
     };
 
