@@ -71,4 +71,18 @@ function sendAppSendListen(appName) {
     });
 }
 
-export default { openApp, packageApp, sendAppInit, sendAppEnd, sendAppSendListen };
+function receiveApp(ipv4, port) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once(Event.AM_RECEIVE_APP_FINISHED, (event, { error }) => {
+            if (error) {
+                reject();
+            } else {
+                resolve();
+            }
+        });
+
+        ipcRenderer.send(Event.AM_RECEIVE_APP, { ipv4, port });
+    });
+}
+
+export default { openApp, packageApp, sendAppInit, sendAppEnd, sendAppSendListen, receiveApp };

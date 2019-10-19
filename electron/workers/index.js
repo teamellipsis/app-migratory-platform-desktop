@@ -7,6 +7,7 @@ log.overrideLogging(mainWorkerLogFile);
 
 module.exports.register = () => {
     require(path.join(__dirname, 'zip'));
+    require(path.join(__dirname, 'receive-app'));
     console.log(`Main worker ${process.pid} registered`);
 }
 

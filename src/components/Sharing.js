@@ -7,8 +7,8 @@ import SendIcon from '@material-ui/icons/Send';
 import ReceiveIcon from '@material-ui/icons/GetApp';
 import QrCodeDialog from './QrCodeDialog';
 import SelectNetworkDialog from './SelectNetworkDialog';
-import SnackMessage from './SnackMessage';
 import LoadingDialog from './LoadingDialog';
+import ReceiveAppDialog from './ReceiveAppDialog';
 import _ from 'lodash';
 
 import Intent from '../const/Intent';
@@ -44,10 +44,8 @@ class Sharing extends React.Component {
         appName: null,
         connections: [],
         server: null,
-        openSnack: false,
-        snackMsg: '',
-        snackVariant: Snack.SUCCESS,
         openLoadingDialog: false,
+        openReceiveAppDialog: false,
     };
 
     componentDidUpdate(prevProps, prevState) {
@@ -138,20 +136,18 @@ class Sharing extends React.Component {
     };
 
     handleSnackOpen = (msg, variant) => {
-        this.setState({
-            openSnack: true,
-            snackMsg: msg,
-            snackVariant: variant,
-        });
+        this.props.snackOpen(msg, variant);
     };
 
     handleSnackClose = () => {
-        this.setState({ openSnack: false });
+        this.props.snackClose();
     };
 
     handleClickSendApp = () => { };
 
-    handleClickReceiveApp = () => { };
+    handleClickReceiveApp = () => {
+        this.setState({ openReceiveAppDialog: true });
+    };
 
     handleOpenLoadingDialog = () => {
         this.setState({ openLoadingDialog: true });
@@ -161,8 +157,12 @@ class Sharing extends React.Component {
         this.setState({ openLoadingDialog: false });
     };
 
+    handleCloseReceiveAppDialog = () => {
+        this.setState({ openReceiveAppDialog: false });
+    };
+
     render() {
-        const { classes, active } = this.props;
+        const { classes, active, changeWindow, snackOpen, snackClose } = this.props;
         let display = active ? 'block' : 'none';
         return (
             <div style={{ display }} className={classes.root}>
@@ -201,16 +201,17 @@ class Sharing extends React.Component {
                     onClickItem={this.handleOnSelectNetworkInterface}
                     updateConnectionList={this.updateConnectionList}
                 />
-                <SnackMessage
-                    open={this.state.openSnack}
-                    onClose={this.handleSnackClose}
-                    variant={this.state.snackVariant}
-                    message={this.state.snackMsg}
-                />
                 <LoadingDialog
                     open={this.state.openLoadingDialog}
                     onClose={this.handleCloseLoadingDialog}
                     message="Processing..."
+                />
+                <ReceiveAppDialog
+                    open={this.state.openReceiveAppDialog}
+                    onClose={this.handleCloseReceiveAppDialog}
+                    changeWindow={changeWindow}
+                    snackOpen={snackOpen}
+                    snackClose={snackClose}
                 />
             </div>
         );
@@ -221,6 +222,9 @@ Sharing.propTypes = {
     active: PropTypes.bool.isRequired,
     classes: PropTypes.object.isRequired,
     intent: PropTypes.object,
+    changeWindow: PropTypes.func.isRequired,
+    snackOpen: PropTypes.func.isRequired,
+    snackClose: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Sharing);

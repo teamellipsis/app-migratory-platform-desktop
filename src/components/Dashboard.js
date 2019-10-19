@@ -21,6 +21,9 @@ import ShareIcon from '@material-ui/icons/SwapHoriz';
 import Apps from './Apps';
 import Devices from './Devices';
 import Sharing from './Sharing';
+import SnackMessage from './SnackMessage';
+
+import Snack from '../const/Snack';
 
 const drawerWidth = 240;
 
@@ -104,6 +107,9 @@ class Dashboard extends React.Component {
         open: false,
         selectedDrawerItemsIndex: 0,
         intent: null,
+        openSnack: false,
+        snackMsg: '',
+        snackVariant: Snack.SUCCESS,
     };
 
     handleDrawerOpen = () => {
@@ -126,6 +132,18 @@ class Dashboard extends React.Component {
             selectedDrawerItemsIndex: index,
             intent: intent,
         });
+    };
+
+    handleSnackOpen = (msg, variant) => {
+        this.setState({
+            openSnack: true,
+            snackMsg: msg,
+            snackVariant: variant,
+        });
+    };
+
+    handleSnackClose = () => {
+        this.setState({ openSnack: false });
     };
 
     render() {
@@ -197,9 +215,17 @@ class Dashboard extends React.Component {
                             key: index,
                             changeWindow: this.changeWindow,
                             intent: intent,
+                            snackOpen: this.handleSnackOpen,
+                            snackClose: this.handleSnackClose,
                         })
                     ))}
                 </main>
+                <SnackMessage
+                    open={this.state.openSnack}
+                    onClose={this.handleSnackClose}
+                    variant={this.state.snackVariant}
+                    message={this.state.snackMsg}
+                />
             </div>
         );
     }

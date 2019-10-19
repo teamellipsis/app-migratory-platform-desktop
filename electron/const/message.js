@@ -7,3 +7,5 @@ module.exports.SOCKET_ERROR = "socket_error";
 module.exports.SOCKET_LISTENING = "socket_listening";
 module.exports.SOCKET_SENT = "socket_sent";
 module.exports.SOCKET_GET_ADDR = "socket_get_address";
+module.exports.RECEIVE_APP_INIT = "receive_app_init";
+module.exports.RECEIVE_APP_FINISHED = "receive_app_finished";

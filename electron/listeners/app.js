@@ -138,3 +138,27 @@ ipcMain.on(Event.AM_SEND_APP_SEND_FINISH_LISTEN, (event, { appName }) => {
         }
     });
 });
+
+ipcMain.on(Event.AM_RECEIVE_APP, (event, { ipv4, port }) => {
+    let mainWorker = require('../workers/mainWorker').get();
+    if (mainWorker !== null) {
+        keyValueDb.get(Key.APPS_DIR).then((appsDirPath) => {
+            mainWorker.send({
+                msg: message.RECEIVE_APP_INIT,
+                appsDirPath,
+                ipv4,
+                port,
+            });
+
+            mainWorker.on('message', (msg) => {
+                if (msg.msg === message.RECEIVE_APP_FINISHED) {
+                    event.sender.send(Event.AM_RECEIVE_APP_FINISHED, { error: msg.error });
+                }
+            });
+        }).catch((error) => {
+            event.sender.send(Event.AM_RECEIVE_APP_FINISHED, { error });
+        });
+    } else {
+        event.sender.send(Event.AM_RECEIVE_APP_FINISHED, { error: "Worker process failed" })
+    }
+});
