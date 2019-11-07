@@ -61,11 +61,14 @@ ipcMain.on(Event.AM_PACKAGE_APP, (event, { appName }) => {
                     appName: appName,
                 });
 
-                mainWorker.on('message', (msg) => {
+                const listner = (msg) => {
                     if (msg.msg === message.PACKAGE_FINISHED) {
                         event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error: msg.error });
+                        mainWorker.removeListener('message', listner);
                     }
-                });
+                };
+
+                mainWorker.on('message', listner);
             }).catch((error) => {
                 event.sender.send(Event.AM_PACKAGE_APP_FINISH, { error });
             });
@@ -150,15 +153,61 @@ ipcMain.on(Event.AM_RECEIVE_APP, (event, { ipv4, port }) => {
                 port,
             });
 
-            mainWorker.on('message', (msg) => {
+            const listner = (msg) => {
                 if (msg.msg === message.RECEIVE_APP_FINISHED) {
                     event.sender.send(Event.AM_RECEIVE_APP_FINISHED, { error: msg.error });
+                    mainWorker.removeListener('message', listner);
                 }
-            });
+            };
+
+            mainWorker.on('message', listner);
         }).catch((error) => {
             event.sender.send(Event.AM_RECEIVE_APP_FINISHED, { error });
         });
     } else {
         event.sender.send(Event.AM_RECEIVE_APP_FINISHED, { error: "Worker process failed" })
+    }
+});
+
+ipcMain.on(Event.AM_SEND_APP_TRUSTED, (event, { appName, device }) => {
+    let mainWorker = require('../workers/mainWorker').get();
+    if (mainWorker !== null) {
+        keyValueDb.get(Key.APPS_DIR).then((appsDirPath) => {
+            mainWorker.send({
+                msg: message.GET_DEVICE_IP,
+                mac: device.mac,
+            });
+
+            const listner = (msg) => {
+                const { error } = msg;
+                if (msg.msg === message.GET_DEVICE_IP_FINISHED) {
+                    if (error === null) {
+                        // Send app to trusted device
+                        mainWorker.send({
+                            msg: message.SEND_APP_INIT,
+                            appsDirPath,
+                            appName,
+                            ipv4: msg.ip,
+                            port: 5000,
+                        });
+                    } else {
+                        // Device not found
+                        event.sender.send(Event.AM_SEND_APP_TRUSTED_FINISHED, { error: "DEVICE_NOT_FOUND" });
+                        mainWorker.removeListener('message', listner);
+                    }
+
+                } else if (msg.msg === message.SEND_APP_FINISHED) {
+                    // App send successfully
+                    event.sender.send(Event.AM_SEND_APP_TRUSTED_FINISHED, { error });
+                    mainWorker.removeListener('message', listner);
+                }
+            };
+
+            mainWorker.on('message', listner);
+        }).catch((error) => {
+            event.sender.send(Event.AM_SEND_APP_TRUSTED_FINISHED, { error });
+        });
+    } else {
+        event.sender.send(Event.AM_SEND_APP_TRUSTED_FINISHED, { error: "Worker process failed" })
     }
 });

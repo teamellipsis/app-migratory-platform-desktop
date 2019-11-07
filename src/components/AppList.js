@@ -10,7 +10,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
 import AppOptionDialog from './AppOptionDialog';
-import SnackMessage from './SnackMessage';
+import TrustedDeviceDialog from './TrustedDeviceDialog';
 
 import db from '../config/Database';
 import key from '../const/Key';
@@ -39,9 +39,7 @@ class AppList extends React.Component {
         apps: null,
         openDialog: false,
         appName: '',
-        openSnack: false,
-        snackMsg: '',
-        snackVariant: snack.SUCCESS,
+        openTrustedDeviceDialog: false,
     };
 
     componentDidMount() {
@@ -77,15 +75,11 @@ class AppList extends React.Component {
     };
 
     handleSnackOpen = (msg, variant) => {
-        this.setState({
-            openSnack: true,
-            snackMsg: msg,
-            snackVariant: variant,
-        });
+        this.props.snackOpen(msg, variant);
     };
 
     handleSnackClose = () => {
-        this.setState({ openSnack: false });
+        this.props.snackClose();
     };
 
     handleAppOpen = () => {
@@ -104,6 +98,10 @@ class AppList extends React.Component {
         });
     };
 
+    handleAppSendTrusted = () => {
+        this.handleOpenTrustedDeviceDialog();
+    };
+
     handleAppSend = () => {
         this.props.changeWindow(Window.SHARING, {
             action: Intent.ACTION_EXECUTE,
@@ -115,27 +113,53 @@ class AppList extends React.Component {
     handleAppReset = () => { };
     handleAppDelete = () => { };
 
+    handleOpenTrustedDeviceDialog = () => {
+        this.setState({ openTrustedDeviceDialog: true });
+    };
+
+    handleCloseTrustedDeviceDialog = () => {
+        this.setState({ openTrustedDeviceDialog: false });
+    };
+
+    handleAppSendTrustedDevice = (device) => {
+        this.props.loadingOpen("Sending...");
+        this.handleCloseTrustedDeviceDialog();
+        appManager.sendAppTrusted(this.state.appName, device).then(() => {
+            this.props.loadingClose();
+            this.handleSnackOpen(`App(${this.state.appName}) succesfully send.`, snack.SUCCESS);
+        }).catch((error) => {
+            this.props.loadingClose();
+            if (error === "DEVICE_NOT_FOUND") {
+                this.handleSnackOpen(`Device not found. Please connect device and try again.`, snack.ERROR);
+            } else if (error === "CONNECT_ERROR") {
+                this.handleSnackOpen(`'${device.name}' not ready to receive app.`, snack.ERROR);
+            } else {
+                this.handleSnackOpen(`App(${this.state.appName}) failed to send. Please try again.`, snack.ERROR);
+            }
+        });
+    };
+
     render() {
         const { classes } = this.props;
-        const { apps, openSnack, snackMsg, snackVariant } = this.state;
+        const { apps, openDialog, appName, openTrustedDeviceDialog } = this.state;
 
         return (
             <div className={classes.root}>
                 <AppOptionDialog
-                    open={this.state.openDialog}
-                    title={this.state.appName}
+                    open={openDialog}
+                    title={appName}
                     onClose={this.handleDialogClose}
                     handleOpen={this.handleAppOpen}
                     handlePackage={this.handleAppPackage}
+                    handleSendTrusted={this.handleAppSendTrusted}
                     handleSend={this.handleAppSend}
                     handleReset={this.handleAppReset}
                     handleDelete={this.handleAppDelete}
                 />
-                <SnackMessage
-                    open={openSnack}
-                    onClose={this.handleSnackClose}
-                    variant={snackVariant}
-                    message={snackMsg}
+                <TrustedDeviceDialog
+                    open={openTrustedDeviceDialog}
+                    onClose={this.handleCloseTrustedDeviceDialog}
+                    onDeviceClick={this.handleAppSendTrustedDevice}
                 />
                 <Grid container spacing={16}>
                     <Grid item xs={12}>
@@ -171,6 +195,10 @@ class AppList extends React.Component {
 AppList.propTypes = {
     classes: PropTypes.object.isRequired,
     changeWindow: PropTypes.func.isRequired,
+    snackOpen: PropTypes.func.isRequired,
+    snackClose: PropTypes.func.isRequired,
+    loadingOpen: PropTypes.func.isRequired,
+    loadingClose: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(AppList);

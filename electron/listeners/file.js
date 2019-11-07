@@ -12,11 +12,14 @@ ipcMain.on(Event.FM_EXTRACT_ZIP, (event, { filePath, targetPath }) => {
     if (mainWorker !== null) {
         mainWorker.send({ msg: message.EXECUTE, func: 'extractZip', filePath, targetPath });
 
-        mainWorker.on('message', (msg) => {
+        const listner = (msg) => {
             if (msg.msg === message.EXTRACT_FINISHED) {
                 event.sender.send(Event.FM_EXTRACT_ZIP_FINISH, { error: msg.error })
+                mainWorker.removeListener('message', listner);
             }
-        });
+        };
+
+        mainWorker.once('message', listner);
     } else {
         event.sender.send(Event.FM_EXTRACT_ZIP_FINISH, { error: "Worker process failed" })
     }

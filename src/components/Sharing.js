@@ -7,7 +7,6 @@ import SendIcon from '@material-ui/icons/Send';
 import ReceiveIcon from '@material-ui/icons/GetApp';
 import QrCodeDialog from './QrCodeDialog';
 import SelectNetworkDialog from './SelectNetworkDialog';
-import LoadingDialog from './LoadingDialog';
 import ReceiveAppDialog from './ReceiveAppDialog';
 import _ from 'lodash';
 
@@ -44,7 +43,6 @@ class Sharing extends React.Component {
         appName: null,
         connections: [],
         server: null,
-        openLoadingDialog: false,
         openReceiveAppDialog: false,
     };
 
@@ -150,11 +148,11 @@ class Sharing extends React.Component {
     };
 
     handleOpenLoadingDialog = () => {
-        this.setState({ openLoadingDialog: true });
+        this.props.loadingOpen("Processing...");
     };
 
     handleCloseLoadingDialog = () => {
-        this.setState({ openLoadingDialog: false });
+        this.props.loadingClose();
     };
 
     handleCloseReceiveAppDialog = () => {
@@ -201,11 +199,6 @@ class Sharing extends React.Component {
                     onClickItem={this.handleOnSelectNetworkInterface}
                     updateConnectionList={this.updateConnectionList}
                 />
-                <LoadingDialog
-                    open={this.state.openLoadingDialog}
-                    onClose={this.handleCloseLoadingDialog}
-                    message="Processing..."
-                />
                 <ReceiveAppDialog
                     open={this.state.openReceiveAppDialog}
                     onClose={this.handleCloseReceiveAppDialog}
@@ -225,6 +218,8 @@ Sharing.propTypes = {
     changeWindow: PropTypes.func.isRequired,
     snackOpen: PropTypes.func.isRequired,
     snackClose: PropTypes.func.isRequired,
+    loadingOpen: PropTypes.func.isRequired,
+    loadingClose: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Sharing);

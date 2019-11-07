@@ -35,6 +35,9 @@ const styles = theme => ({
     refresh: {
         textAlign: "right",
     },
+    add: {
+        textAlign: "right",
+    },
     subTitle: {
         paddingTop: theme.spacing.unit * 2,
     },
@@ -120,7 +123,7 @@ class DeviceList extends React.Component {
                                         Trusted devices
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={2} className={classes.refresh}>
+                                <Grid item xs={2} className={classes.add}>
                                     <IconButton onClick={onAddDevice}>
                                         <AddIcon />
                                     </IconButton>

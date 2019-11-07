@@ -85,4 +85,26 @@ function receiveApp(ipv4, port) {
     });
 }
 
-export default { openApp, packageApp, sendAppInit, sendAppEnd, sendAppSendListen, receiveApp };
+function sendAppTrusted(appName, device) {
+    return new Promise((resolve, reject) => {
+        ipcRenderer.once(Event.AM_SEND_APP_TRUSTED_FINISHED, (event, { error }) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve();
+            }
+        });
+
+        ipcRenderer.send(Event.AM_SEND_APP_TRUSTED, { appName, device });
+    });
+}
+
+export default {
+    openApp,
+    packageApp,
+    sendAppInit,
+    sendAppEnd,
+    sendAppSendListen,
+    receiveApp,
+    sendAppTrusted,
+};

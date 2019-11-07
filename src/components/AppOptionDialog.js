@@ -9,7 +9,8 @@ import DialogContent from '@material-ui/core/DialogContent';
 import Dialog from '@material-ui/core/Dialog';
 import Divider from '@material-ui/core/Divider';
 
-const options = ['Open', 'Package', 'Send', 'Reset', 'Delete'];
+const options = ['Open', 'Package', 'Send (Trusted)', 'Send (Any)', 'Reset', 'Delete'];
+const optionsIndex = ['Open', 'Package', 'SendTrusted', 'Send', 'Reset', 'Delete'];
 const styles = {};
 
 class AppOptionDialog extends React.Component {
@@ -17,8 +18,8 @@ class AppOptionDialog extends React.Component {
         this.props.onClose();
     };
 
-    handleListItemClick = (option) => () => {
-        let func = `handle${option}`;
+    handleListItemClick = (index) => () => {
+        let func = `handle${optionsIndex[index]}`;
         this.props[func]();
         this.props.onClose();
     };
@@ -42,7 +43,7 @@ class AppOptionDialog extends React.Component {
                                 <ListItem
                                     button
                                     key={option}
-                                    onClick={this.handleListItemClick(option)}
+                                    onClick={this.handleListItemClick(index)}
                                 >
                                     <ListItemText primary={option} />
                                 </ListItem>
@@ -62,6 +63,7 @@ AppOptionDialog.propTypes = {
     title: PropTypes.string.isRequired,
     handleOpen: PropTypes.func.isRequired,
     handlePackage: PropTypes.func.isRequired,
+    handleSendTrusted: PropTypes.func.isRequired,
     handleSend: PropTypes.func.isRequired,
     handleReset: PropTypes.func.isRequired,
     handleDelete: PropTypes.func.isRequired,

@@ -22,6 +22,7 @@ import Apps from './Apps';
 import Devices from './Devices';
 import Sharing from './Sharing';
 import SnackMessage from './SnackMessage';
+import LoadingDialog from './LoadingDialog';
 
 import Snack from '../const/Snack';
 
@@ -110,6 +111,8 @@ class Dashboard extends React.Component {
         openSnack: false,
         snackMsg: '',
         snackVariant: Snack.SUCCESS,
+        openLoadingDialog: false,
+        loadingMsg: '',
     };
 
     handleDrawerOpen = () => {
@@ -144,6 +147,17 @@ class Dashboard extends React.Component {
 
     handleSnackClose = () => {
         this.setState({ openSnack: false });
+    };
+
+    handleOpenLoadingDialog = (msg = "Loading...") => {
+        this.setState({
+            openLoadingDialog: true,
+            loadingMsg: msg,
+        });
+    };
+
+    handleCloseLoadingDialog = () => {
+        this.setState({ openLoadingDialog: false });
     };
 
     render() {
@@ -217,6 +231,8 @@ class Dashboard extends React.Component {
                             intent: intent,
                             snackOpen: this.handleSnackOpen,
                             snackClose: this.handleSnackClose,
+                            loadingOpen: this.handleOpenLoadingDialog,
+                            loadingClose: this.handleCloseLoadingDialog,
                         })
                     ))}
                 </main>
@@ -225,6 +241,11 @@ class Dashboard extends React.Component {
                     onClose={this.handleSnackClose}
                     variant={this.state.snackVariant}
                     message={this.state.snackMsg}
+                />
+                <LoadingDialog
+                    open={this.state.openLoadingDialog}
+                    onClose={this.handleCloseLoadingDialog}
+                    message={this.state.loadingMsg}
                 />
             </div>
         );

@@ -9,3 +9,7 @@ module.exports.SOCKET_SENT = "socket_sent";
 module.exports.SOCKET_GET_ADDR = "socket_get_address";
 module.exports.RECEIVE_APP_INIT = "receive_app_init";
 module.exports.RECEIVE_APP_FINISHED = "receive_app_finished";
+module.exports.SEND_APP_INIT = "send_app_init";
+module.exports.SEND_APP_FINISHED = "send_app_finished";
+module.exports.GET_DEVICE_IP = "get_ip";
+module.exports.GET_DEVICE_IP_FINISHED = "get_ip_finished";

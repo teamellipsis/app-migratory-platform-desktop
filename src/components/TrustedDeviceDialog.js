@@ -11,32 +11,49 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemText from '@material-ui/core/ListItemText';
 import Avatar from '@material-ui/core/Avatar';
 import Typography from '@material-ui/core/Typography';
-import SwapVertIcon from '@material-ui/icons/SwapVert';
-import IconButton from '@material-ui/core/IconButton';
-import RefreshIcon from '@material-ui/icons/Refresh';
+import TrustedDeviceIcon from '@material-ui/icons/ImportantDevices'
+
+import db from '../config/Database';
 
 const styles = theme => ({
     content: {
         textAlign: 'center',
-    },
-    refresh: {
-        position: 'absolute',
-        right: theme.spacing.unit,
-        top: theme.spacing.unit,
     },
     title: {
         margin: `${theme.spacing.unit * 2}px 0 0`,
     },
 });
 
-class SelectNetworkDialog extends React.Component {
+class TrustedDeviceDialog extends React.Component {
+    state = {
+        trustedDevices: [],
+    }
+    done = false;
+
+    componentDidUpdate() {
+        if (this.props.open === true && !this.done) {
+            this.done = true;
+            this.updateTrustedDeviceList();
+        }
+    }
+
     handleClose = () => {
+        this.done = false;
         this.props.onClose();
     };
 
-    render() {
-        const { classes, open, connections, onClickItem, updateConnectionList } = this.props;
+    updateTrustedDeviceList = () => {
+        let devices = db.getAllDevices().value;
+        this.setState({ trustedDevices: devices });
+    };
 
+    handleOnClickDevice = (device) => () => {
+        this.props.onDeviceClick(device);
+    };
+
+    render() {
+        const { classes, open } = this.props;
+        const { trustedDevices } = this.state;
         return (
             <Dialog
                 fullWidth={true}
@@ -46,30 +63,27 @@ class SelectNetworkDialog extends React.Component {
             >
                 <DialogTitle id="dialog-title">
                     <Typography color="inherit">
-                        Select network interface
+                        Select a trusted device
                     </Typography>
-                    <IconButton className={classes.refresh} onClick={updateConnectionList}>
-                        <RefreshIcon />
-                    </IconButton>
                 </DialogTitle>
                 <Divider />
                 <DialogContent className={classes.content}>
-                    {connections === undefined || connections.length === 0 ?
-                        <Typography align={'center'} color="inherit" className={classes.title}>
-                            No connections. Please establish connection and refresh.
+                    {trustedDevices === undefined || trustedDevices.length === 0 ?
+                        <Typography align={'center'} color="inherit" noWrap className={classes.title}>
+                            No trusted devices. Add new device.
                         </Typography>
                         :
                         <List dense={true}>
-                            {connections.map((connection, index) => (
-                                <ListItem button key={index} onClick={onClickItem(connection)}>
+                            {trustedDevices.map((device, index) => (
+                                <ListItem button key={index} onClick={this.handleOnClickDevice(device)}>
                                     <ListItemAvatar>
                                         <Avatar>
-                                            <SwapVertIcon />
+                                            <TrustedDeviceIcon />
                                         </Avatar>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        primary={connection.name + " (" + connection.ip + ")"}
-                                        secondary={connection.mac}
+                                        primary={device.name}
+                                        secondary={device.mac}
                                     />
                                 </ListItem>
                             ))}
@@ -81,13 +95,11 @@ class SelectNetworkDialog extends React.Component {
     }
 }
 
-SelectNetworkDialog.propTypes = {
+TrustedDeviceDialog.propTypes = {
     classes: PropTypes.object.isRequired,
-    onClose: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
-    connections: PropTypes.array.isRequired,
-    onClickItem: PropTypes.func.isRequired,
-    updateConnectionList: PropTypes.func.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onDeviceClick: PropTypes.func.isRequired,
 };
 
-export default withStyles(styles)(SelectNetworkDialog);
+export default withStyles(styles)(TrustedDeviceDialog);

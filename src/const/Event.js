@@ -26,3 +26,5 @@ module.exports.AM_SEND_APP_SEND_FINISH_LISTEN = "send-app-finish-listen_app-mana
 module.exports.AM_SEND_APP_SEND_FINISHED = "send-app-finished_app-manager";
 module.exports.AM_RECEIVE_APP = "receive_app-manager";
 module.exports.AM_RECEIVE_APP_FINISHED = "receive-finished_app-manager";
+module.exports.AM_SEND_APP_TRUSTED = "send-trusted_app-manager";
+module.exports.AM_SEND_APP_TRUSTED_FINISHED = "send-trusted-finished_app-manager";

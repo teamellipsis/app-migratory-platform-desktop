@@ -11,11 +11,17 @@ const styles = theme => ({
 
 class Apps extends React.Component {
     render() {
-        const { classes, active, changeWindow } = this.props;
+        const { classes, active, changeWindow, snackOpen, snackClose, loadingOpen, loadingClose } = this.props;
         let display = active ? 'block' : 'none';
         return (
             <div style={{ display }} className={classes.root}>
-                <AppList changeWindow={changeWindow} />
+                <AppList
+                    changeWindow={changeWindow}
+                    snackOpen={snackOpen}
+                    snackClose={snackClose}
+                    loadingOpen={loadingOpen}
+                    loadingClose={loadingClose}
+                />
             </div>
         );
     }
@@ -25,6 +31,10 @@ Apps.propTypes = {
     active: PropTypes.bool.isRequired,
     classes: PropTypes.object.isRequired,
     changeWindow: PropTypes.func.isRequired,
+    snackOpen: PropTypes.func.isRequired,
+    snackClose: PropTypes.func.isRequired,
+    loadingOpen: PropTypes.func.isRequired,
+    loadingClose: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Apps);

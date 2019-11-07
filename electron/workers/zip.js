@@ -3,7 +3,7 @@ const path = require('path');
 const message = require(path.join(__dirname, '../const/message'));
 
 process.on('message', (inMsg) => {
-    console.log(inMsg);
+    console.log(__filename, inMsg);
     const { msg, func, ...args } = inMsg;
     if (msg === message.EXECUTE) {
         if (typeof this[func] === 'function') {
