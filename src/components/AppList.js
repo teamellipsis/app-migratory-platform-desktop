@@ -11,6 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
 import AppOptionDialog from './AppOptionDialog';
 import TrustedDeviceDialog from './TrustedDeviceDialog';
+import ConfirmationDialog from './ConfirmationDialog';
 
 import db from '../config/Database';
 import key from '../const/Key';
@@ -19,7 +20,7 @@ import Window from '../const/Window';
 import Intent from '../const/Intent';
 import appManager from '../config/AppManager';
 
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 
 const styles = theme => ({
@@ -34,12 +35,17 @@ const styles = theme => ({
     },
 });
 
+const RESET = "reset";
+const DELETE = "delete";
+
 class AppList extends React.Component {
     state = {
         apps: null,
         openDialog: false,
         appName: '',
         openTrustedDeviceDialog: false,
+        openConfirmationDialog: false,
+        resetOrDelete: RESET,
     };
 
     componentDidMount() {
@@ -110,8 +116,13 @@ class AppList extends React.Component {
         });
     };
 
-    handleAppReset = () => { };
-    handleAppDelete = () => { };
+    handleAppReset = () => {
+        this.handleOpenConfirmationDialog(RESET);
+    };
+
+    handleAppDelete = () => {
+        this.handleOpenConfirmationDialog(DELETE);
+    };
 
     handleOpenTrustedDeviceDialog = () => {
         this.setState({ openTrustedDeviceDialog: true });
@@ -139,9 +150,48 @@ class AppList extends React.Component {
         });
     };
 
+    handleOpenConfirmationDialog = (resetOrDelete) => {
+        this.setState({
+            openConfirmationDialog: true,
+            resetOrDelete
+        });
+    };
+
+    handleCloseConfirmationDialog = () => {
+        this.setState({ openConfirmationDialog: false });
+    };
+
+    onYesResetOrDelete = () => {
+        try {
+            const appsDir = db.get(key.APPS_DIR).value;
+            if (this.state.resetOrDelete === RESET) {
+                const uiStatePath = path.join(appsDir, this.state.appName, 'state');
+                const daemonStatePath = path.join(appsDir, this.state.appName, 'state_daemon');
+                // TODO(should run main process)
+                fs.unlinkSync(uiStatePath);
+                fs.unlinkSync(daemonStatePath);
+
+            } else if (this.state.resetOrDelete === DELETE) {
+                const appPath = path.join(appsDir, this.state.appName);
+                // TODO(should run main process)
+                fs.removeSync(appPath);
+            }
+        } catch (error) {
+            this.handleSnackOpen(
+                `App(${this.state.appName}) failed to ${this.state.resetOrDelete}. Please try again.`,
+                snack.ERROR
+            );
+        }
+    };
+
     render() {
         const { classes } = this.props;
-        const { apps, openDialog, appName, openTrustedDeviceDialog } = this.state;
+        const {
+            apps, openDialog, appName,
+            openTrustedDeviceDialog,
+            openConfirmationDialog,
+            resetOrDelete,
+        } = this.state;
 
         return (
             <div className={classes.root}>
@@ -160,6 +210,13 @@ class AppList extends React.Component {
                     open={openTrustedDeviceDialog}
                     onClose={this.handleCloseTrustedDeviceDialog}
                     onDeviceClick={this.handleAppSendTrustedDevice}
+                />
+                <ConfirmationDialog
+                    open={openConfirmationDialog}
+                    onClose={this.handleCloseConfirmationDialog}
+                    message={`Do you want to ${resetOrDelete} '${appName}'?`}
+                    onYes={this.onYesResetOrDelete}
+                    onNo={() => { }}
                 />
                 <Grid container spacing={16}>
                     <Grid item xs={12}>
