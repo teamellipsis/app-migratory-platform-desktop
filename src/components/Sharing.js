@@ -8,6 +8,7 @@ import ReceiveIcon from '@material-ui/icons/GetApp';
 import QrCodeDialog from './QrCodeDialog';
 import SelectNetworkDialog from './SelectNetworkDialog';
 import ReceiveAppDialog from './ReceiveAppDialog';
+import AppListDialog from './AppListDialog';
 import _ from 'lodash';
 
 import Intent from '../const/Intent';
@@ -44,6 +45,7 @@ class Sharing extends React.Component {
         connections: [],
         server: null,
         openReceiveAppDialog: false,
+        openSendAppDialog: false,
     };
 
     componentDidUpdate(prevProps, prevState) {
@@ -141,7 +143,9 @@ class Sharing extends React.Component {
         this.props.snackClose();
     };
 
-    handleClickSendApp = () => { };
+    handleClickSendApp = () => {
+        this.setState({ openSendAppDialog: true });
+    };
 
     handleClickReceiveApp = () => {
         this.setState({ openReceiveAppDialog: true });
@@ -157,6 +161,14 @@ class Sharing extends React.Component {
 
     handleCloseReceiveAppDialog = () => {
         this.setState({ openReceiveAppDialog: false });
+    };
+
+    handleCloseSendAppDialog = () => {
+        this.setState({ openSendAppDialog: false });
+    };
+
+    handleOnClickAppSendAppDialog = (appName) => {
+        this.handleSendApp({ appName });
     };
 
     render() {
@@ -205,6 +217,12 @@ class Sharing extends React.Component {
                     changeWindow={changeWindow}
                     snackOpen={snackOpen}
                     snackClose={snackClose}
+                />
+                <AppListDialog
+                    open={this.state.openSendAppDialog}
+                    onClose={this.handleCloseSendAppDialog}
+                    onAppClick={this.handleOnClickAppSendAppDialog}
+                    title={"Select sending app"}
                 />
             </div>
         );
