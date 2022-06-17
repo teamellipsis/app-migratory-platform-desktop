@@ -25,7 +25,7 @@
     "@rescripts/rescript-env": "0.0.10",
     "concurrently": "^4.1.2",
     "cross-env": "^5.2.0",
-    "electron": "2.0.8",
+    "electron": "15.5.5",
     "electron-builder": "^20.43.0",
     "electron-packager": "^13.1.1",
     "electron-rebuild": "^1.8.6",
